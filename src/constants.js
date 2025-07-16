@@ -1,5 +1,9 @@
-export const API_KEY = '8cac6dec66e09ab439c081b251304443'
+export const API_KEY = process.env.REACT_APP_API_KEY;
 export const ENDPOINT = 'https://api.themoviedb.org/3'
+
+if (!API_KEY) {
+  throw new Error('API key is not set. Define REACT_APP_API_KEY in .env file.');
+}
 
 export const buildApiUrl = (relativePath, params = {}) => {
     const cleanPath = relativePath.replace(/^\/+/, '');
