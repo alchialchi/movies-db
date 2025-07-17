@@ -1,16 +1,38 @@
-import { useState, useMemo } from 'react'
-import { Link, NavLink } from "react-router-dom"
-import { useSelector } from 'react-redux'
+import { useState, useMemo, useCallback } from 'react'
+import { Link, NavLink, useNavigate, createSearchParams } from "react-router-dom"
+import { useDispatch, useSelector } from 'react-redux'
 import debounce from 'lodash.debounce'
+import { fetchMovies } from '../data/moviesSlice'
+import { ENDPOINT_SEARCH, ENDPOINT_DISCOVER } from '../constants'
 
 import '../styles/header.scss'
 
-const Header = ({ searchMovies }) => {
+const Header = () => {
   const { starredMovies } = useSelector((state) => state.starred)
   const [inputValue, setInputValue] = useState('')
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
-  const debouncedSearch = useMemo(() => debounce(searchMovies, 500), [searchMovies])
+  const getSearchResults = (query) => {
+    if (query !== '') {
+      dispatch(fetchMovies(ENDPOINT_SEARCH(query)))
+      const searchParams = createSearchParams({ search: query })
+      navigate({ pathname: '/', search: searchParams.toString() })
+    } else {
+      dispatch(fetchMovies(ENDPOINT_DISCOVER))
+      navigate('/')
+    }
+  }
 
+  const searchMovies = useCallback((query) => {
+    getSearchResults(query)
+  }, [navigate])
+
+  const debouncedSearch = useMemo(() => {
+    console.log('debounce renders')
+    return debounce(searchMovies, 500)
+  }, [searchMovies])
+  
   const handleChange = (e) => {
     const value = e.target.value
     setInputValue(value)
