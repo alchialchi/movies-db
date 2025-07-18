@@ -36,13 +36,14 @@ const App = () => {
   const getMovie = async (id) => {
     const URL = ENDPOINT_MOVIE(id)
 
-    setVideoKey(null)
     const videoData = await fetch(URL)
       .then((response) => response.json())
 
     if (videoData.videos && videoData.videos.results.length) {
       const trailer = videoData.videos.results.find(vid => vid.type === 'Trailer')
       setVideoKey(trailer ? trailer.key : videoData.videos.results[0].key)
+    } else {
+      setVideoKey(null)
     }
   }
 
@@ -51,13 +52,12 @@ const App = () => {
       <Header/>
 
       <div className="container">
-        {videoKey ? (
-          <YouTubePlayer
-            videoKey={videoKey}
-          />
-        ) : (
-          <div style={{padding: "30px"}}><h6>no trailer available. Try another movie</h6></div>
-        )}
+       {videoKey && <YouTubePlayer videoKey={videoKey} />}
+       {videoKey === null && (
+        <div style={{ padding: '30px' }}>
+          <h6>no trailer available. Try another movie</h6>
+        </div>
+       )}
 
         <Routes>
           <Route path="/" element={<Movies movies={movies} viewTrailer={viewTrailer} />} />
