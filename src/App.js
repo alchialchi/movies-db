@@ -12,7 +12,6 @@ import YouTubePlayer from './components/YoutubePlayer'
 import './app.scss'
 
 const App = () => {
-
   const { movies } = useSelector((state) => state)
   const dispatch = useDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -52,7 +51,7 @@ const App = () => {
       <Header/>
 
       <div className="container">
-       {videoKey && <YouTubePlayer videoKey={videoKey} />}
+       {videoKey && isOpen && <YouTubePlayer videoKey={videoKey} onClose={() => setOpen(false)} />}
        {videoKey === null && (
         <div style={{ padding: '30px' }}>
           <h6>no trailer available. Try another movie</h6>
