@@ -14,7 +14,7 @@ import './app.scss'
 const App = () => {
   const { movies, fetchStatus } = useSelector((state) => state.movies)
   const dispatch = useDispatch()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('search')
   const [videoKey, setVideoKey] = useState()
   const [isOpen, setOpen] = useState(false)

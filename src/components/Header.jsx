@@ -13,7 +13,7 @@ const Header = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const getSearchResults = (query) => {
+  const getSearchResults = useCallback((query) => {
     if (query !== '') {
       dispatch(fetchMovies(ENDPOINT_SEARCH(query)))
       const searchParams = createSearchParams({ search: query })
@@ -22,11 +22,11 @@ const Header = () => {
       dispatch(fetchMovies(ENDPOINT_DISCOVER))
       navigate('/')
     }
-  }
+  }, [dispatch, navigate])
 
   const searchMovies = useCallback((query) => {
     getSearchResults(query)
-  }, [navigate])
+  }, [getSearchResults])
 
   const debouncedSearch = useMemo(() => {
     return debounce(searchMovies, 500)
