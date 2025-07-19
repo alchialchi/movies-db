@@ -1,11 +1,11 @@
 import Movie from './Movie'
 import '../styles/movies.scss'
 
-const Movies = ({ movies, viewTrailer }) => {
+const Movies = ({ movies, viewTrailer, fetchStatus, loadMore }) => {
 
     return (
         <div className='wrapper' data-testid="movies">
-            {movies.movies.results?.map((movie) => {
+            {movies.results?.map((movie) => {
                 return (
                     <Movie 
                         movie={movie} 
@@ -14,6 +14,16 @@ const Movies = ({ movies, viewTrailer }) => {
                     />
                 )
             })}
+            {movies.page < movies.total_pages && (
+                <div>
+                   <button
+                       onClick={loadMore}
+                       disabled={fetchStatus === 'loading'}
+                    >
+                    {fetchStatus === 'loading' ? 'Loading…' : 'Load More'}
+                  </button>
+                </div>
+            )}
         </div>
     )
 }

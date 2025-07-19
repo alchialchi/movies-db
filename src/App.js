@@ -12,20 +12,21 @@ import YouTubePlayer from './components/YoutubePlayer'
 import './app.scss'
 
 const App = () => {
-  const { movies } = useSelector((state) => state)
+  const { movies, fetchStatus } = useSelector((state) => state.movies)
   const dispatch = useDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
   const searchQuery = searchParams.get('search')
   const [videoKey, setVideoKey] = useState()
   const [isOpen, setOpen] = useState(false)
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
-    if (searchQuery) {
-      dispatch(fetchMovies(ENDPOINT_SEARCH(searchQuery)))
-    } else {
-      dispatch(fetchMovies(ENDPOINT_DISCOVER))
-    }
-  }, [dispatch, searchQuery])
+    const baseUrl = searchQuery
+    ? ENDPOINT_SEARCH(searchQuery)
+    : ENDPOINT_DISCOVER
+    const url = `${baseUrl}&page=${page}`
+    dispatch(fetchMovies(url))
+  }, [dispatch, searchQuery, page])
 
   const viewTrailer = (movie) => {
     getMovie(movie.id)
@@ -59,7 +60,7 @@ const App = () => {
        )}
 
         <Routes>
-          <Route path="/" element={<Movies movies={movies} viewTrailer={viewTrailer} />} />
+          <Route path="/" element={<Movies movies={movies} viewTrailer={viewTrailer} fetchStatus={fetchStatus} loadMore={() => setPage(p => p + 1)} />} />
           <Route path="/starred" element={<Starred viewTrailer={viewTrailer} />} />
           <Route path="/watch-later" element={<WatchLater viewTrailer={viewTrailer} />} />
           <Route path="*" element={<h1 className="not-found">Page Not Found</h1>} />

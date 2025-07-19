@@ -29,7 +29,6 @@ const Header = () => {
   }, [navigate])
 
   const debouncedSearch = useMemo(() => {
-    console.log('debounce renders')
     return debounce(searchMovies, 500)
   }, [searchMovies])
   
