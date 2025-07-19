@@ -1,7 +1,15 @@
+import useInfiniteScroll from '../hooks/useInfiniteScroll'
 import Movie from './Movie'
 import '../styles/movies.scss'
 
 const Movies = ({ movies, viewTrailer, fetchStatus, loadMore }) => {
+
+    useInfiniteScroll({
+        isLoading: fetchStatus === 'loading',
+        hasMore: movies.page < movies.total_pages,
+        onLoadMore: loadMore,
+        threshold: 200
+    })
 
     return (
         <div className='wrapper' data-testid="movies">
@@ -14,15 +22,8 @@ const Movies = ({ movies, viewTrailer, fetchStatus, loadMore }) => {
                     />
                 )
             })}
-            {movies.page < movies.total_pages && (
-                <div>
-                   <button
-                       onClick={loadMore}
-                       disabled={fetchStatus === 'loading'}
-                    >
-                    {fetchStatus === 'loading' ? 'Loading…' : 'Load More'}
-                  </button>
-                </div>
+            {fetchStatus === 'loading' && (
+                <div>Loading...</div>
             )}
         </div>
     )
