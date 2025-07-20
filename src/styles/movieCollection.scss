@@ -1,4 +1,19 @@
-.starred {
+.movie-collection {
+    .row {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+
+        @media (max-width: 720px) {
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 480px) {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+    }
   
     footer {
         margin-top: 50px;

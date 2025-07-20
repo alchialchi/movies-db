@@ -1,5 +1,28 @@
-export const API_KEY = '8cac6dec66e09ab439c081b251304443'
+export const API_KEY = process.env.REACT_APP_API_KEY;
 export const ENDPOINT = 'https://api.themoviedb.org/3'
-export const ENDPOINT_DISCOVER = ENDPOINT+'/discover/movie/?api_key='+API_KEY+'&sort_by=vote_count.desc'
-export const ENDPOINT_SEARCH = ENDPOINT+'/search/movie/?api_key='+API_KEY
-export const ENDPOINT_MOVIE = ENDPOINT+'/movie/507086?api_key='+API_KEY+'&append_to_response=videos'
+
+if (!API_KEY) {
+  throw new Error('API key is not set. Define REACT_APP_API_KEY in .env file.');
+}
+
+export const buildApiUrl = (relativePath, params = {}) => {
+    const cleanPath = relativePath.replace(/^\/+/, '');
+    const url = new URL(`${ENDPOINT}/${cleanPath}`);
+    url.searchParams.set('api_key', API_KEY);
+
+  for (const [key, value] of Object.entries(params)) {
+    url.searchParams.set(key, value)
+  }
+
+  return url.toString()
+}
+
+export const ENDPOINT_DISCOVER = buildApiUrl('/discover/movie', {
+  sort_by: 'vote_count.desc',
+})
+
+export const ENDPOINT_SEARCH = (query) =>
+  buildApiUrl('search/movie', { query })
+
+export const ENDPOINT_MOVIE = (id) =>
+  buildApiUrl(`movie/${id}`, { append_to_response: 'videos' })

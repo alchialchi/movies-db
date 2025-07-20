@@ -1,11 +1,42 @@
-import { Link, NavLink } from "react-router-dom"
-import { useSelector } from 'react-redux'
+import { useState, useMemo, useCallback } from 'react'
+import { Link, NavLink, useNavigate, createSearchParams } from "react-router-dom"
+import { useDispatch, useSelector } from 'react-redux'
+import debounce from 'lodash.debounce'
+import { fetchMovies } from '../data/moviesSlice'
+import { ENDPOINT_SEARCH, ENDPOINT_DISCOVER } from '../constants'
 
 import '../styles/header.scss'
 
-const Header = ({ searchMovies }) => {
-  
+const Header = () => {
   const { starredMovies } = useSelector((state) => state.starred)
+  const [inputValue, setInputValue] = useState('')
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const getSearchResults = useCallback((query) => {
+    if (query !== '') {
+      dispatch(fetchMovies(ENDPOINT_SEARCH(query)))
+      const searchParams = createSearchParams({ search: query })
+      navigate({ pathname: '/', search: searchParams.toString() })
+    } else {
+      dispatch(fetchMovies(ENDPOINT_DISCOVER))
+      navigate('/')
+    }
+  }, [dispatch, navigate])
+
+  const searchMovies = useCallback((query) => {
+    getSearchResults(query)
+  }, [getSearchResults])
+
+  const debouncedSearch = useMemo(() => {
+    return debounce(searchMovies, 500)
+  }, [searchMovies])
+  
+  const handleChange = (e) => {
+    const value = e.target.value
+    setInputValue(value)
+    debouncedSearch(value)
+  }
 
   return (
     <header>
@@ -32,7 +63,8 @@ const Header = ({ searchMovies }) => {
       <div className="input-group rounded">
         <Link to="/" onClick={(e) => searchMovies('')} className="search-link" >
           <input type="search" data-testid="search-movies"
-            onKeyUp={(e) => searchMovies(e.target.value)} 
+            value={inputValue}
+            onChange={handleChange}
             className="form-control rounded" 
             placeholder="Search movies..." 
             aria-label="Search movies" 

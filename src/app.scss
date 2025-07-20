@@ -34,11 +34,57 @@
     transition: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;        
     -webkit-animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
     animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+  }
 
-    .video-player {
-      max-width: 100%;
-      height: 60vw;
-    }
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   
+  .modal-content {
+    position: relative;
+    background: #000;
+    border-radius: 8px;
+    max-width: 100%;
+    max-height: 80vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    max-width: 100%;
+    aspect-ratio: auto 16 / 9;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+    color: white;
+
+    border-radius: 4px;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
 }

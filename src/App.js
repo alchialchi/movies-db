@@ -1,94 +1,66 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route, createSearchParams, useSearchParams, useNavigate } from "react-router-dom"
+import { Routes, Route, useSearchParams } from "react-router-dom"
 import { useDispatch, useSelector } from 'react-redux'
 import 'reactjs-popup/dist/index.css'
 import { fetchMovies } from './data/moviesSlice'
-import { ENDPOINT_SEARCH, ENDPOINT_DISCOVER, ENDPOINT, API_KEY } from './constants'
+import { ENDPOINT_SEARCH, ENDPOINT_DISCOVER, ENDPOINT_MOVIE } from './constants'
 import Header from './components/Header'
 import Movies from './components/Movies'
-import Starred from './components/Starred'
-import WatchLater from './components/WatchLater'
+import { Starred, WatchLater } from './components/MovieCollection'
 import YouTubePlayer from './components/YoutubePlayer'
+
 import './app.scss'
 
 const App = () => {
-
-  const state = useSelector((state) => state)
-  const { movies } = state  
+  const { movies, fetchStatus } = useSelector((state) => state.movies)
   const dispatch = useDispatch()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('search')
   const [videoKey, setVideoKey] = useState()
   const [isOpen, setOpen] = useState(false)
-  const navigate = useNavigate()
-  
-  const closeModal = () => setOpen(false)
-  
-  const closeCard = () => {
+  const [page, setPage] = useState(1)
 
-  }
-
-  const getSearchResults = (query) => {
-    if (query !== '') {
-      dispatch(fetchMovies(`${ENDPOINT_SEARCH}&query=`+query))
-      setSearchParams(createSearchParams({ search: query }))
-    } else {
-      dispatch(fetchMovies(ENDPOINT_DISCOVER))
-      setSearchParams()
-    }
-  }
-
-  const searchMovies = (query) => {
-    navigate('/')
-    getSearchResults(query)
-  }
-
-  const getMovies = () => {
-    if (searchQuery) {
-        dispatch(fetchMovies(`${ENDPOINT_SEARCH}&query=`+searchQuery))
-    } else {
-        dispatch(fetchMovies(ENDPOINT_DISCOVER))
-    }
-  }
+  useEffect(() => {
+    const baseUrl = searchQuery
+    ? ENDPOINT_SEARCH(searchQuery)
+    : ENDPOINT_DISCOVER
+    const url = `${baseUrl}&page=${page}`
+    dispatch(fetchMovies(url))
+  }, [dispatch, searchQuery, page])
 
   const viewTrailer = (movie) => {
     getMovie(movie.id)
-    if (!videoKey) setOpen(true)
     setOpen(true)
   }
 
   const getMovie = async (id) => {
-    const URL = `${ENDPOINT}/movie/${id}?api_key=${API_KEY}&append_to_response=videos`
+    const URL = ENDPOINT_MOVIE(id)
 
-    setVideoKey(null)
     const videoData = await fetch(URL)
       .then((response) => response.json())
 
     if (videoData.videos && videoData.videos.results.length) {
       const trailer = videoData.videos.results.find(vid => vid.type === 'Trailer')
       setVideoKey(trailer ? trailer.key : videoData.videos.results[0].key)
+    } else {
+      setVideoKey(null)
     }
   }
 
-  useEffect(() => {
-    getMovies()
-  }, [])
-
   return (
     <div className="App">
-      <Header searchMovies={searchMovies} searchParams={searchParams} setSearchParams={setSearchParams} />
+      <Header/>
 
       <div className="container">
-        {videoKey ? (
-          <YouTubePlayer
-            videoKey={videoKey}
-          />
-        ) : (
-          <div style={{padding: "30px"}}><h6>no trailer available. Try another movie</h6></div>
-        )}
+       {videoKey && isOpen && <YouTubePlayer videoKey={videoKey} onClose={() => setOpen(false)} />}
+       {videoKey === null && (
+        <div style={{ padding: '30px' }}>
+          <h6>no trailer available. Try another movie</h6>
+        </div>
+       )}
 
         <Routes>
-          <Route path="/" element={<Movies movies={movies} viewTrailer={viewTrailer} closeCard={closeCard} />} />
+          <Route path="/" element={<Movies movies={movies} viewTrailer={viewTrailer} fetchStatus={fetchStatus} loadMore={() => setPage(p => p + 1)} />} />
           <Route path="/starred" element={<Starred viewTrailer={viewTrailer} />} />
           <Route path="/watch-later" element={<WatchLater viewTrailer={viewTrailer} />} />
           <Route path="*" element={<h1 className="not-found">Page Not Found</h1>} />
