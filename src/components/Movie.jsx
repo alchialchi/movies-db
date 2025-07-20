@@ -1,26 +1,26 @@
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import starredSlice from '../data/starredSlice'
 import watchLaterSlice from '../data/watchLaterSlice'
 import placeholder from '../assets/not-found-500X750.jpeg'
 
-const Movie = ({ movie, viewTrailer, closeCard }) => {
+const Movie = ({ movie, viewTrailer }) => {
 
     const state = useSelector((state) => state)
     const { starred, watchLater } = state
     const { starMovie, unstarMovie } = starredSlice.actions
     const { addToWatchLater, removeFromWatchLater } = watchLaterSlice.actions
-
+    const [isOpen, setIsOpen] = useState(false)
     const dispatch = useDispatch()
 
-    const myClickHandler = (e) => {
-        if (!e) var e = window.event
-        e.cancelBubble = true
-        if (e.stopPropagation) e.stopPropagation()
-        e.target.parentElement.parentElement.classList.remove('opened')
+    const handleOpen = () => setIsOpen(true)
+    const handleClose = e => {
+        e.stopPropagation()
+        setIsOpen(false)
     }
 
     return (
-        <div className="card" onClick={(e) => e.currentTarget.classList.add('opened')} >
+        <div className={`card${isOpen ? ' opened' : ''}`} onClick={handleOpen}>
             <div className="card-body text-center">
                 <div className="overlay" />
                 <div className="info_panel">
@@ -60,7 +60,7 @@ const Movie = ({ movie, viewTrailer, closeCard }) => {
             </div>
             <h6 className="title mobile-card">{movie.title}</h6>
             <h6 className="title">{movie.title}</h6>
-            <button type="button" className="close" onClick={(e) => myClickHandler(e)} aria-label="Close">
+            <button type="button" className="close" onClick={handleClose} aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>       
