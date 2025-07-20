@@ -6,9 +6,9 @@ import { fetchMovies } from './data/moviesSlice'
 import { ENDPOINT_SEARCH, ENDPOINT_DISCOVER, ENDPOINT_MOVIE } from './constants'
 import Header from './components/Header'
 import Movies from './components/Movies'
-import Starred from './components/Starred'
-import WatchLater from './components/WatchLater'
+import { Starred, WatchLater } from './components/MovieCollection'
 import YouTubePlayer from './components/YoutubePlayer'
+
 import './app.scss'
 
 const App = () => {
